@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+	<name>Cut encoding for origin</name>
+	<id>ch.hosli.inkscape.origin.svg_cut_encoding</id>
+	<param name="tab" type="notebook">
+		<page name="page_cut_encoding" gui-text="cut encoding">
+			<hbox>
+				<param name="set_cut_type" type="bool" gui-text="set cut type" gui-description="sets the stroke Color">true</param>
+				<spacer size="35"/>
+				<param name="types" type="enum" gui-text="cut type:">
+					<item value="int">interior cut</item>
+					<item value="ext">exterior cut</item>
+					<item value="online">on line cut</item>
+					<item value="poc">pocketing cut</item>
+					<item value="guide_f">guide fill</item>
+					<item value="guide_s">guide stroke</item>
+				</param>
+			</hbox>
+			<spacer size="20"/>
+			<param name="set_stroke_width" type="bool" gui-text="set stroke width" gui-description="sets the stroke width">false</param>
+			<param name="stroke_width" type="float" precision="2" min="0" max="3" appearance="full" gui-text="stroke width">0.01</param>
+			<spacer size="20"/>
+			<separator/>
+			<spacer size="20"/>
+			<hbox>
+				<param name="set_cut_depth" type="bool" gui-text="set cut depth encoding" gui-description="sets the cut depth">false</param>
+				<spacer size="35"/>
+				<param name="unit" type="optiongroup" appearance="radio" gui-text="unit" gui-description="chose unit">
+					<option value="1">mm</option>
+					<option value="2">inches</option>
+				</param>
+			</hbox>
+			<param name="cut_depth_mm" type="float" precision="1" min="0" max="43" appearance="full" gui-text="cut depth in mm">1.2</param>
+			<param name="cut_depth_in" type="float" precision="3" min="0" max="1.4" appearance="full" gui-text="cut depth in inches">0.2</param>
+		</page>
+		<page name="check_path" gui-text="Check Path">
+			<label>EN:</label>
+			<label>this is the ckeck for closed paths</label>
+			<spacer size="20"/>
+			<label>DE:</label>
+			<label>überprüft die Pfade ob sie sauber geschlossen sind</label>
+		</page>
+		<page name="help" gui-text="Help">
+			<label>EN</label>
+			<label appearance="url">https://support.shapertools.com/hc/en-us/articles/115002721473-Cut-Type-Encoding</label>
+			<label>DE</label>
+			<label appearance="url">https://support.shapertools.com/hc/de-de/articles/115002721473-Kodierung-der-Fr%C3%A4sarten-f%C3%BCr-Origin</label>
+		</page>
+	</param>
+	<effect>
+		<effects-menu>
+			<submenu name="Render"/>
+		</effects-menu>
+	</effect>
+	<script>
+		<command location="inx" interpreter="python">cutencoding.py</command>
+	</script>
+</inkscape-extension>
