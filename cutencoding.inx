@@ -33,13 +33,6 @@
 			<param name="cut_depth_mm" type="float" precision="1" min="0" max="43" appearance="full" gui-text="cut depth in mm">1.2</param>
 			<param name="cut_depth_in" type="float" precision="3" min="0" max="1.4" appearance="full" gui-text="cut depth in inches">0.2</param>
 		</page>
-		<page name="check_path" gui-text="Check Path">
-			<label>EN:</label>
-			<label>this is the ckeck for closed paths</label>
-			<spacer size="20"/>
-			<label>DE:</label>
-			<label>überprüft die Pfade ob sie sauber geschlossen sind</label>
-		</page>
 		<page name="help" gui-text="Help">
 			<label>EN</label>
 			<label appearance="url">https://support.shapertools.com/hc/en-us/articles/115002721473-Cut-Type-Encoding</label>
