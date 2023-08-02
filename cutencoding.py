@@ -18,14 +18,58 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 '''
-https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
 '''
 
 import inkex
-inkex.NSS["1shaper"] = "http://www.shapertools.com/namespaces/shaper"
+inkex.NSS["shaper"] = "http://www.shapertools.com/namespaces/shaper"
+
+#from tkinter import messagebox
+from inkex import paths
+from inkex import utils
+
+def check_path_closed(svg_tag_d):
+    #
+    startM = False
+    tag_d_counter = 0
+    m2z_error = []
+    for c in svg_tag_d:
+        if c=="m" or c=="M":
+            if startM == True:
+                # darf nicht true sein denn da fehlt ein ende Z
+                m2z_error.append(tag_d_counter)
+                pass
+            else:
+                startM = True
+                pass
+            pass
+        else:
+            pass
+        if c=="z" or c=="Z":
+            if startM == True:
+                startM = False
+                pass
+            else:
+                #
+                pass
+            pass
+        else:
+            pass
+        tag_d_counter += 1
+        # next c
+        pass
+    #kontrolle auf ende Z
+    if startM == True:
+        # start ist immer noch true-- somit kein Ende Z
+        m2z_error.append(tag_d_counter)
+        pass
+    else:
+        pass
+    #
+    #
+    return m2z_error
+    pass
 
 
-from tkinter import messagebox
 
 
 class set_cut_encodings(inkex.Effect):
@@ -37,24 +81,29 @@ class set_cut_encodings(inkex.Effect):
         pars.add_argument("--tab", type=str, default="page_cut_encoding")
         pars.add_argument("--set_cut_type", type=inkex.Boolean, default=False)
         pars.add_argument("--types", type=str, default="int")
+        pars.add_argument("--check_path_close", type=inkex.Boolean, default=True)
+        pars.add_argument("--try_path_close", type=inkex.Boolean, default=False)
         pars.add_argument("--set_stroke_width", type=inkex.Boolean, default=False)
         pars.add_argument("--stroke_width", type=str, default="0.01")
-        pars.add_argument("--set_cut_depth", type=inkex.Boolean, default=False)
+        pars.add_argument("--cut_depth", type=str, default="1")
         pars.add_argument("--unit", type=str, default="1")
         pars.add_argument("--cut_depth_mm", type=str, default="1")
         pars.add_argument("--cut_depth_in", type=str, default="0.4")
         pass
 
     def effect(self):
-        """
+        #
+        # 
+        #
         
-        """
-        cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff"}
-        cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none"}
+        #
+        cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff","guide_a":"#FF0000"}
+        cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
         units = {"1":"mm","2":"in"}
         #
         for elem in self.svg.selection:
-            cut_depth_possible = True
+            cut_depth_possible = True # not all lines for Cutting
+            #
             if self.options.set_cut_type == True:
                 #
                 elem.style.set_color(cut_types_stroke_colors[self.options.types],'stroke')
@@ -62,28 +111,62 @@ class set_cut_encodings(inkex.Effect):
                 if (self.options.types).startswith("guide"):
                     cut_depth_possible = False
                     pass
+                else:
+                    cut_depth_possible = True
+                    pass
                 pass
+            #
+            if self.options.check_path_close == True and str(elem)=="path":
+                is_closed = check_path_closed(elem.get("d"))
+                if len(is_closed)>0:
+                    utils.errormsg("Path is not close")
+                    utils.errormsg("on: "+ str(is_closed))
+                    if self.options.try_path_close == True and len(is_closed)==1:
+                        p = paths.Path(elem.path)
+                        p.close()
+                        elem.path = p
+                        pass
+                    else:
+                        utils.errormsg("can not solve problems")
+                        pass
+                    pass
+                else:
+                    pass
+                #
+                
+                #
+                pass
+            #
             if self.options.set_stroke_width == True:
                 strokeWidth = round(float(self.options.stroke_width),3)
                 elem.style['stroke-width'] = strokeWidth
                 pass
-            if self.options.set_cut_depth == True:
+            #
+            if self.options.cut_depth == "1":
+                pass
+            elif self.options.cut_depth == "2":
                 if cut_depth_possible == True:
                     unit = units[self.options.unit]
                     depth = "0"
                     if self.options.unit == "1":
+                        # is mm
                         depth = round(float(self.options.cut_depth_mm),1)
                         pass
-                    if self.options.unit == "2":
+                    elif self.options.unit == "2":
+                        # is inch
                         depth = round(float(self.options.cut_depth_in),3)
                         pass
                     elem.set("shaper:cutDepth", str(depth)+unit)
                     pass
                 else:
-                    elem.pop('shaper:cutDepth')
-                    messagebox.showwarning("Warning", "set cut depth encoding not set")
+                    elem.pop("shaper:cutDepth")
+                    utils.errormsg("cut depth encoding not set")
                     pass
                 pass
+            elif self.options.cut_depth == "3":
+                elem.pop("shaper:cutDepth")
+                pass
+            #
             pass
         pass
         #
