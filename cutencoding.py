@@ -6,7 +6,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,6 @@ inkex.NSS["1shaper"] = "http://www.shapertools.com/namespaces/shaper"
 
 
 from tkinter import messagebox
-
 
 
 class set_cut_encodings(inkex.Effect):
@@ -53,46 +52,44 @@ class set_cut_encodings(inkex.Effect):
         cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff"}
         cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none"}
         units = {"1":"mm","2":"in"}
-
-        if self.options.tab == "page_cut_encoding":
-            #
-            for elem in self.svg.selection:
-                cut_depth_possible = True
-                if self.options.set_cut_type == True:
-                    #
-                    elem.style.set_color(cut_types_stroke_colors[self.options.types],'stroke')
-                    elem.style.set_color(cut_types_fill_colors[self.options.types],'fill')
-                    if (self.options.types).startswith("guide"):
-                        cut_depth_possible = False
-                        pass
+        #
+        for elem in self.svg.selection:
+            cut_depth_possible = True
+            if self.options.set_cut_type == True:
+                #
+                elem.style.set_color(cut_types_stroke_colors[self.options.types],'stroke')
+                elem.style.set_color(cut_types_fill_colors[self.options.types],'fill')
+                if (self.options.types).startswith("guide"):
+                    cut_depth_possible = False
                     pass
-                if self.options.set_stroke_width == True:
-                    strokeWidth = round(float(self.options.stroke_width),3)
-                    elem.style['stroke-width'] = strokeWidth
+                pass
+            if self.options.set_stroke_width == True:
+                strokeWidth = round(float(self.options.stroke_width),3)
+                elem.style['stroke-width'] = strokeWidth
+                pass
+            if self.options.set_cut_depth == True:
+                if cut_depth_possible == True:
+                    unit = units[self.options.unit]
+                    depth = "0"
+                    if self.options.unit == "1":
+                        depth = round(float(self.options.cut_depth_mm),1)
+                        pass
+                    if self.options.unit == "2":
+                        depth = round(float(self.options.cut_depth_in),3)
+                        pass
+                    elem.set("shaper:cutDepth", str(depth)+unit)
                     pass
-                if self.options.set_cut_depth == True:
-                    if cut_depth_possible == True:
-                        unit = units[self.options.unit]
-                        depth = "0"
-                        if self.options.unit == "1":
-                            depth = round(float(self.options.cut_depth_mm),1)
-                            pass
-                        if self.options.unit == "2":
-                            depth = round(float(self.options.cut_depth_in),3)
-                            pass
-                        elem.set("shaper:cutDepth", str(depth)+unit)
-                        pass
-                    else:
-                        elem.pop('shaper:cutDepth')
-                        messagebox.showwarning("Warning", "set cut depth encoding not set")
-                        pass
+                else:
+                    elem.pop('shaper:cutDepth')
+                    messagebox.showwarning("Warning", "set cut depth encoding not set")
                     pass
                 pass
             pass
-        #
         pass
+        #
+        
 
-
+    
 if __name__ == '__main__':
     set_cut_encodings().run()
     pass
