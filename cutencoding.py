@@ -71,8 +71,8 @@ def check_path_closed(svg_tag_d):
 
 class set_cut_encodings(inkex.Effect):
     elem_type = ["circle", "ellipse", "line", "path", "polygon", "polyline", "rect"]
-    cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff","guide_a":"#FF0000"}
-    cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
+    cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"none","guide_f":"none","guide_s":"#0000ff","guide_a":"none"}
+    cut_types_fill_colors = {"int":"#ffffff", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
     units = {"1":"mm","2":"in"}
     
     def __init__(self):
@@ -131,6 +131,7 @@ class set_cut_encodings(inkex.Effect):
             else:
                 #is not in list
                 utils.errormsg("selected element not changed")
+                utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
                 utils.errormsg("Element is  " + str(elem.typename) + "")
                 utils.errormsg("Please use one of:")
                 utils.errormsg(str(self.elem_type))
@@ -158,6 +159,7 @@ class set_cut_encodings(inkex.Effect):
         else:
             elem.pop("shaper:cutDepth")
             utils.errormsg("cut depth encoding not set")
+            utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
             utils.errormsg("stroke color is" + stroke_color)
             utils.errormsg("should by #000000(black) or #969696(grey)")
             pass
@@ -172,6 +174,7 @@ class set_cut_encodings(inkex.Effect):
         is_closed = check_path_closed(elem.get("d"))
         if len(is_closed)>0:
             utils.errormsg("Path is not close")
+            utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
             utils.errormsg("on: "+ str(is_closed))
             if self.options.try_path_close == True and len(is_closed)==1:
                 p = paths.Path(elem.path)
@@ -180,6 +183,7 @@ class set_cut_encodings(inkex.Effect):
                 pass
             elif self.options.try_path_close == True and len(is_closed)>1:
                 utils.errormsg("can not solve problems")
+                utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
                 pass
             else:
                 #
