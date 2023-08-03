@@ -56,7 +56,7 @@
 	</param>
 	<effect>
 		<effects-menu>
-			<submenu name="Render"/>
+			<submenu name="Modify Path"/>
 		</effects-menu>
 	</effect>
 	<script>
