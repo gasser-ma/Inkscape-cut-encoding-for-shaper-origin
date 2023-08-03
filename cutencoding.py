@@ -17,13 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-'''
-'''
 
 import inkex
 inkex.NSS["shaper"] = "http://www.shapertools.com/namespaces/shaper"
 
-#from tkinter import messagebox
 from inkex import paths
 from inkex import utils
 
@@ -73,6 +70,11 @@ def check_path_closed(svg_tag_d):
 
 
 class set_cut_encodings(inkex.Effect):
+    elem_type = ["circle", "ellipse", "line", "path", "polygon", "polyline", "rect"]
+    cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff","guide_a":"#FF0000"}
+    cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
+    units = {"1":"mm","2":"in"}
+    
     def __init__(self):
         inkex.Effect.__init__(self)
         pass
@@ -92,84 +94,112 @@ class set_cut_encodings(inkex.Effect):
         pass
 
     def effect(self):
-        #
-        # 
-        #
-        
-        #
-        cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"#969696","guide_f":"#0000ff","guide_s":"#0000ff","guide_a":"#FF0000"}
-        cut_types_fill_colors = {"int":"none", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
-        units = {"1":"mm","2":"in"}
-        #
-        for elem in self.svg.selection:
-            cut_depth_possible = True # not all lines for Cutting
+        self.iterator(self.svg.selection)
+        pass
+
+    def iterator(self, e):
+        # if e is group --> cals itself
+        for elem in e:
             #
-            if self.options.set_cut_type == True:
+            if str(elem) in self.elem_type:
                 #
-                elem.style.set_color(cut_types_stroke_colors[self.options.types],'stroke')
-                elem.style.set_color(cut_types_fill_colors[self.options.types],'fill')
-                if (self.options.types).startswith("guide"):
-                    cut_depth_possible = False
-                    pass
-                else:
-                    cut_depth_possible = True
-                    pass
-                pass
-            #
-            if self.options.check_path_close == True and str(elem)=="path":
-                is_closed = check_path_closed(elem.get("d"))
-                if len(is_closed)>0:
-                    utils.errormsg("Path is not close")
-                    utils.errormsg("on: "+ str(is_closed))
-                    if self.options.try_path_close == True and len(is_closed)==1:
-                        p = paths.Path(elem.path)
-                        p.close()
-                        elem.path = p
-                        pass
-                    else:
-                        utils.errormsg("can not solve problems")
-                        pass
-                    pass
-                else:
+                if self.options.set_cut_type == True:
+                    self.setCutType(elem)
                     pass
                 #
-                
-                #
-                pass
-            #
-            if self.options.set_stroke_width == True:
-                strokeWidth = round(float(self.options.stroke_width),3)
-                elem.style['stroke-width'] = strokeWidth
-                pass
-            #
-            if self.options.cut_depth == "1":
-                pass
-            elif self.options.cut_depth == "2":
-                if cut_depth_possible == True:
-                    unit = units[self.options.unit]
-                    depth = "0"
-                    if self.options.unit == "1":
-                        # is mm
-                        depth = round(float(self.options.cut_depth_mm),1)
-                        pass
-                    elif self.options.unit == "2":
-                        # is inch
-                        depth = round(float(self.options.cut_depth_in),3)
-                        pass
-                    elem.set("shaper:cutDepth", str(depth)+unit)
+                if self.options.check_path_close == True and str(elem)=="path":
+                    self.checkPathClose(elem)
                     pass
-                else:
+                #
+                if self.options.set_stroke_width == True:
+                    self.setStrokeWidth(elem)
+                    pass
+                #
+                if self.options.cut_depth == "1":
+                    pass
+                elif self.options.cut_depth == "2":
+                    self.setCutDepth(elem)
+                    pass
+                elif self.options.cut_depth == "3":
                     elem.pop("shaper:cutDepth")
-                    utils.errormsg("cut depth encoding not set")
                     pass
+                #
                 pass
-            elif self.options.cut_depth == "3":
-                elem.pop("shaper:cutDepth")
+            elif str(elem) == "g":
+                self.iterator(elem)
                 pass
-            #
+            else:
+                #is not in list
+                utils.errormsg("selected element not changed")
+                utils.errormsg("Element is  " + str(elem.typename) + "")
+                utils.errormsg("Please use one of:")
+                utils.errormsg(str(self.elem_type))
+                pass
+        #next elem
+        pass
+
+    def setCutDepth(self, elem):
+        #
+        stroke_color = elem.style['stroke']
+        #
+        if stroke_color == "#000000" or stroke_color == "#969696":
+            unit = self.units[self.options.unit]
+            depth = "0"
+            if self.options.unit == "1":
+                # is mm
+                depth = round(float(self.options.cut_depth_mm),1)
+                pass
+            elif self.options.unit == "2":
+                # is inch
+                depth = round(float(self.options.cut_depth_in),3)
+                pass
+            elem.set("shaper:cutDepth", str(depth)+unit)
+            pass
+        else:
+            elem.pop("shaper:cutDepth")
+            utils.errormsg("cut depth encoding not set")
+            utils.errormsg("stroke color is" + stroke_color)
+            utils.errormsg("should by #000000(black) or #969696(grey)")
             pass
         pass
-        #
+
+    def setStrokeWidth(self, elem):
+        strokeWidth = round(float(self.options.stroke_width),3)
+        elem.style['stroke-width'] = strokeWidth
+        pass
+
+    def checkPathClose(self, elem):
+        is_closed = check_path_closed(elem.get("d"))
+        if len(is_closed)>0:
+            utils.errormsg("Path is not close")
+            utils.errormsg("on: "+ str(is_closed))
+            if self.options.try_path_close == True and len(is_closed)==1:
+                p = paths.Path(elem.path)
+                p.close()
+                elem.path = p
+                pass
+            elif self.options.try_path_close == True and len(is_closed)>1:
+                utils.errormsg("can not solve problems")
+                pass
+            else:
+                #
+                pass
+            pass
+        else:
+            pass
+        pass
+
+    def setCutType(self, elem):
+        elem.style.set_color(self.cut_types_stroke_colors[self.options.types],'stroke')
+        elem.style.set_color(self.cut_types_fill_colors[self.options.types],'fill')
+        # end def 
+        pass
+    #
+    ##
+    # end class
+    pass
+
+
         
 
     
