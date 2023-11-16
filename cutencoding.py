@@ -24,50 +24,6 @@ inkex.NSS["shaper"] = "http://www.shapertools.com/namespaces/shaper"
 from inkex import paths
 from inkex import utils
 
-def check_path_closed(svg_tag_d):
-    #
-    startM = False
-    tag_d_counter = 0
-    m2z_error = []
-    for c in svg_tag_d:
-        if c=="m" or c=="M":
-            if startM == True:
-                # darf nicht true sein denn da fehlt ein ende Z
-                m2z_error.append(tag_d_counter)
-                pass
-            else:
-                startM = True
-                pass
-            pass
-        else:
-            pass
-        if c=="z" or c=="Z":
-            if startM == True:
-                startM = False
-                pass
-            else:
-                #
-                pass
-            pass
-        else:
-            pass
-        tag_d_counter += 1
-        # next c
-        pass
-    #kontrolle auf ende Z
-    if startM == True:
-        # start ist immer noch true-- somit kein Ende Z
-        m2z_error.append(tag_d_counter)
-        pass
-    else:
-        pass
-    #
-    #
-    return m2z_error
-    pass
-
-
-
 
 class set_cut_encodings(inkex.Effect):
     elem_type = ["circle", "ellipse", "line", "path", "polygon", "polyline", "rect"]
@@ -171,27 +127,50 @@ class set_cut_encodings(inkex.Effect):
         pass
 
     def checkPathClose(self, elem):
-        is_closed = check_path_closed(elem.get("d"))
-        if len(is_closed)>0:
-            utils.errormsg("Path is not close")
-            utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
-            utils.errormsg("on: "+ str(is_closed))
-            if self.options.try_path_close == True and len(is_closed)==1:
-                p = paths.Path(elem.path)
-                p.close()
-                elem.path = p
+        svg_tag_d = elem.get("d")
+        svg_new_d = ""
+        has_m = False
+        has_z = True
+        i=0
+        for d in svg_tag_d:
+            #
+            if d.upper() =="M":
+                has_m = True
+                if has_z == True:
+                    has_z = False
+                    pass
+                else:
+                    utils.errormsg("no Z at " + str(i))
+                    svg_new_d = svg_new_d + "Z "
+                    pass
                 pass
-            elif self.options.try_path_close == True and len(is_closed)>1:
-                utils.errormsg("can not solve problems")
-                utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
+            else:
+                pass
+            if d.upper() == "Z":
+                has_z = True
+                if has_m==True:
+                    has_m=False
+                    pass
+                else:
+                    pass
                 pass
             else:
                 #
                 pass
             pass
-        else:
-            pass
+            svg_new_d = svg_new_d + d
+            i=i+1
         pass
+        if svg_tag_d[-1].upper()=="Z":
+            pass
+        else:
+            svg_new_d = svg_new_d + " Z"
+            pass
+        if self.options.try_path_close == True:
+            elem.path = svg_new_d
+            pass
+    pass
+
 
     def setCutType(self, elem):
         elem.style.set_color(self.cut_types_stroke_colors[self.options.types],'stroke')
