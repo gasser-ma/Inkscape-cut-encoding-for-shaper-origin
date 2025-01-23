@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--by matthias gasser-->
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-	<name>Cut encoding for origin</name>
+	<name>Cut encoding for Origin</name>
 	<id>ch.hosli.inkscape.origin.svg_cut_encoding</id>
 	<param name="tab" type="notebook">
 		<page name="page_cut_encoding" gui-text="cut encoding">
@@ -18,35 +18,51 @@
 					<item value="guide_a">custom anchor</item>
 				</param>
 			</hbox>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<separator/>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<hbox>
 				<param name="check_path_close" type="bool" gui-text="check path is close" gui-description="cheks if the path is closed">true</param>
 				<param name="try_path_close" type="bool" gui-text="try to close path" gui-description="try to close the path">false</param>
 			</hbox>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<separator/>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<param name="set_stroke_width" type="bool" gui-text="set stroke width" gui-description="sets the stroke width">false</param>
 			<param name="stroke_width" type="float" precision="2" min="0" max="3" appearance="full" gui-text="stroke width">0.01</param>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<separator/>
-			<spacer size="20"/>
+			<spacer size="10"/>
 			<hbox>
-				<param name="cut_depth" type="optiongroup" appearance="radio" gui-text="cut depth encoding">
+				<param name="cut_depth" type="optiongroup" appearance="radio" gui-text="cut depth">
 					<option value="1">none</option>
 					<option value="2">insert</option>
 					<option value="3">delete</option>
 				</param>
-				<spacer size="35"/>
-				<param name="unit" type="optiongroup" appearance="radio" gui-text="unit" gui-description="chose unit">
-					<option value="1">mm</option>
-					<option value="2">inches</option>
-				</param>
 			</hbox>
 			<param name="cut_depth_mm" type="float" precision="1" min="0" max="43" appearance="full" gui-text="cut depth in mm">1.2</param>
-			<param name="cut_depth_in" type="float" precision="3" min="0" max="1.4" appearance="full" gui-text="cut depth in inches">0.2</param>
+			<spacer size="10"/>
+			<separator/>
+			<spacer size="10"/>
+			<hbox>
+				<param name="cut_Offset" type="optiongroup" appearance="radio" gui-text="cut Offset">
+					<option value="1">none</option>
+					<option value="2">insert</option>
+					<option value="3">delete</option>
+				</param>
+			</hbox>
+			<param name="cut_Offset_mm" type="float" precision="1" min="0" max="43" appearance="full" gui-text="cut Offset in mm">0.0</param>
+			<spacer size="10"/>
+			<separator/>
+			<spacer size="10"/>
+			<hbox>
+				<param name="tool_Dia" type="optiongroup" appearance="radio" gui-text="tool Dia">
+					<option value="1">none</option>
+					<option value="2">insert</option>
+					<option value="3">delete</option>
+				</param>
+			</hbox>
+			<param name="tool_Dia_mm" type="float" precision="1" min="0" max="43" appearance="full" gui-text="Tool Dia in mm">8.0</param>
 		</page>
 		<page name="help" gui-text="Help">
 			<label>EN</label>
