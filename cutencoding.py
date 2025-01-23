@@ -19,9 +19,8 @@
 #
 
 import inkex
-inkex.NSS["shaper"] = "http://www.shapertools.com/namespaces/shaper"
 
-from inkex import paths
+#from inkex import paths
 from inkex import utils
 
 
@@ -29,7 +28,7 @@ class set_cut_encodings(inkex.Effect):
     elem_type = ["circle", "ellipse", "line", "path", "polygon", "polyline", "rect"]
     cut_types_stroke_colors = {"int":"#000000", "ext":"#000000", "online":"#969696","poc":"none","guide_f":"none","guide_s":"#0000ff","guide_a":"none"}
     cut_types_fill_colors = {"int":"#ffffff", "ext":"#000000", "online":"none","poc":"#969696","guide_f":"#0000ff","guide_s":"none","guide_a":"#FF0000"}
-    units = {"1":"mm","2":"in"}
+    #units = {"1":"mm","2":"in"}
     
     def __init__(self):
         inkex.Effect.__init__(self)
@@ -43,10 +42,17 @@ class set_cut_encodings(inkex.Effect):
         pars.add_argument("--try_path_close", type=inkex.Boolean, default=False)
         pars.add_argument("--set_stroke_width", type=inkex.Boolean, default=False)
         pars.add_argument("--stroke_width", type=str, default="0.01")
+        
         pars.add_argument("--cut_depth", type=str, default="1")
-        pars.add_argument("--unit", type=str, default="1")
         pars.add_argument("--cut_depth_mm", type=str, default="1")
-        pars.add_argument("--cut_depth_in", type=str, default="0.4")
+
+        pars.add_argument("--cut_Offset", type=str, default="1")
+        pars.add_argument("--cut_Offset_mm", type=str, default="0")
+
+        pars.add_argument("--tool_Dia", type=str, default="1")
+        pars.add_argument("--tool_Dia_mm", type=str, default="8")
+
+        pars.add_argument("--unit", type=str, default="mm")
         pass
 
     def effect(self):
@@ -77,7 +83,39 @@ class set_cut_encodings(inkex.Effect):
                     self.setCutDepth(elem)
                     pass
                 elif self.options.cut_depth == "3":
-                    elem.pop("shaper:cutDepth")
+                    for a in elem.attrib:
+                        if "cutDepth" in a:
+                            #utils.errormsg(a)
+                            elem.pop(a)
+                            pass
+                        pass
+                    #utils.errormsg(elem.attrib)
+                    pass
+                #
+                if self.options.cut_Offset == "1":
+                    pass
+                elif self.options.cut_Offset == "2":
+                    self.setCutOffset(elem)
+                    pass
+                elif self.options.cut_Offset == "3":
+                    for a in elem.attrib:
+                        if "cutOffset" in a:
+                            elem.pop(a)
+                            pass
+                        pass
+                    pass
+                #
+                if self.options.tool_Dia == "1":
+                    pass
+                elif self.options.tool_Dia == "2":
+                    self.setToolDia(elem)
+                    pass
+                elif self.options.tool_Dia == "3":
+                    for a in elem.attrib:
+                        if "toolDia" in a:
+                            elem.pop(a)
+                            pass
+                        pass
                     pass
                 #
                 pass
@@ -95,30 +133,31 @@ class set_cut_encodings(inkex.Effect):
         #next elem
         pass
 
+    def setToolDia(self, elem):
+        #
+        unit = "mm"
+        dia = "0"
+        dia = round(float(self.options.tool_Dia_mm),1)
+        url = "http://www.shapertools.com/namespaces/"
+        elem.set(url + "shaper:toolDia", str(dia)+unit)
+        pass
+
+    def setCutOffset(self, elem):
+        #
+        unit = "mm"
+        offset = "0"
+        offset = round(float(self.options.cut_Offset_mm),1)
+        url = "http://www.shapertools.com/namespaces/"
+        elem.set(url + "shaper:cutOffset", str(offset)+unit)
+        pass
+
     def setCutDepth(self, elem):
         #
-        stroke_color = elem.style['stroke']
-        #
-        if stroke_color == "#000000" or stroke_color == "#969696":
-            unit = self.units[self.options.unit]
-            depth = "0"
-            if self.options.unit == "1":
-                # is mm
-                depth = round(float(self.options.cut_depth_mm),1)
-                pass
-            elif self.options.unit == "2":
-                # is inch
-                depth = round(float(self.options.cut_depth_in),3)
-                pass
-            elem.set("shaper:cutDepth", str(depth)+unit)
-            pass
-        else:
-            elem.pop("shaper:cutDepth")
-            utils.errormsg("cut depth encoding not set")
-            utils.errormsg("Element ID is: " + str(elem.get('id')) + "")
-            utils.errormsg("stroke color is" + stroke_color)
-            utils.errormsg("should by #000000(black) or #969696(grey)")
-            pass
+        unit = "mm"
+        depth = "0"
+        depth = round(float(self.options.cut_depth_mm),1)
+        url = "http://www.shapertools.com/namespaces/"
+        elem.set(url + "shaper:cutDepth", str(depth)+unit)
         pass
 
     def setStrokeWidth(self, elem):
@@ -169,8 +208,7 @@ class set_cut_encodings(inkex.Effect):
         if self.options.try_path_close == True:
             elem.path = svg_new_d
             pass
-    pass
-
+        pass
 
     def setCutType(self, elem):
         elem.style.set_color(self.cut_types_stroke_colors[self.options.types],'stroke')
@@ -178,7 +216,6 @@ class set_cut_encodings(inkex.Effect):
         # end def 
         pass
     #
-    ##
     # end class
     pass
 
